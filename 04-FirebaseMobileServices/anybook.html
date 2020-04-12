@@ -1,0 +1,85 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Book</title>
+    <script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-firestore.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <form>
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name"><br>
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="genre">Genre:</label><br>
+        <input type="text" id="genre" name="genre"><br>
+        <label for="year">Year:</label><br>
+        <input type="text" id="year" name="year"><br>
+        <label for="isbn">ISBN:</label><br>
+        <input type="text" id="isbn" name="isbn"><br>
+        <button type='button' id="saveButton">Save</button>
+        <div class="book"></div>
+
+    </form>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyA6RAmmokUdWTMR9QqbqmTovH5z2enLT8A",
+            authDomain: "psm-exercise-1.firebaseapp.com",
+            databaseURL: "https://psm-exercise-1.firebaseio.com",
+            projectId: "psm-exercise-1",
+            storageBucket: "psm-exercise-1.appspot.com",
+            messagingSenderId: "766368996077",
+            appId: "1:766368996077:web:f8722684deff7895b90ae4"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        var firestore = firebase.firestore();
+        const name = document.querySelector("#name");
+        const title = document.querySelector("#title");
+        const genre = document.querySelector("#genre");
+        const year = document.querySelector("#year");
+        const isbn = document.querySelector("#isbn");
+        const saveButton = document.querySelector("#saveButton");
+
+        saveButton.addEventListener("click", function () {
+            var nameToSave = name.value;
+            var titleToSave = title.value;
+            var genreToSave = genre.value;
+            var yearToSave = year.value;
+            var isbnToSave = isbn.value;
+
+            firestore.collection("book").add({
+                name: nameToSave,
+                title: titleToSave,
+                genre: genreToSave,
+                year: yearToSave,
+                isbn: isbnToSave
+            }).then(function (docRef) {
+                getData(docRef.id);
+            }).catch(function (error) {
+                console.error("Error adding document: ", error);
+            });
+        });
+
+        getData = function (docId) {
+            firestore.collection("book").doc(docId).get()
+                .then(function (doc) {
+                    if (doc.exists) {
+                        for (let [key, value] of Object.entries(doc.data())) {
+                            $(".book").append(`<p>${key}: ${value}</p>`);
+                        }
+                    } else {
+                        console.log("No such document!");
+                    }
+                }).catch(function (error) {
+                    console.log("Error getting document:", error);
+                });
+        }
+    </script>
+</body>
+
+</html>
